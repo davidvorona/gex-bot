@@ -92,9 +92,6 @@ function extractTokensFromGexText(textArray: string[]): string[][] {
     return tokens;
 }
 
-const tokens = extractTokensFromGexText(GEX_TEXT);
-console.log(tokens);
-
 const setGuildCommands = async (guildId: string, builtCommands: AnyObject[] = []) => {
     try {
         console.log(`Refreshing application (/) commands for guild ${guildId}`);
@@ -106,6 +103,8 @@ const setGuildCommands = async (guildId: string, builtCommands: AnyObject[] = []
         console.error(error);
     }
 };
+
+let tokens: string[][];
 
 client.on("ready", async () => {
     try {
@@ -121,6 +120,7 @@ client.on("ready", async () => {
                 await setGuildCommands(guild.id);
             }));
         }
+        tokens = extractTokensFromGexText(GEX_TEXT);
     } catch (err) {
         console.error(err);
     }
