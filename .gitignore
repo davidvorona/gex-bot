@@ -1,0 +1,6 @@
+node_modules/
+.vscode/
+
+dist/
+config/
+!config/commands.js
