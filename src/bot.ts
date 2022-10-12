@@ -71,6 +71,7 @@ const GEX_TEXT = [
 ];
 
 const ignoredUpperCaseWords = ["dont", "i", "can", "to", "im", "ha", "youre", "day", "thats"];
+const APOSTROPHE_S = "'s";
 
 function extractTokensFromGexText(textArray: string[]): string[][] {
     const tokens: string[][] = [];
@@ -81,9 +82,19 @@ function extractTokensFromGexText(textArray: string[]): string[][] {
             if (
                 word[0] === word[0].toUpperCase()
             ) {
-                const cleanWord = word.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "");
+                let IS_POSSESSIVE = false;
+                const possessiveIdx = word.indexOf(APOSTROPHE_S);
+                if (possessiveIdx > -1) {
+                    IS_POSSESSIVE = true;
+                }
+                const cleanWord = word.toLowerCase().replace(/[^a-zA-Z0-9]/g, "");
                 if(ignoredUpperCaseWords.indexOf(cleanWord) === -1) {
                     phraseTokens.push(cleanWord);
+                    if (IS_POSSESSIVE) {
+                        const w = cleanWord.substring(0, possessiveIdx)
+                            + cleanWord.substring(possessiveIdx + 1);
+                        phraseTokens.push(w);
+                    }
                 }
             }
         });
@@ -121,6 +132,7 @@ client.on("ready", async () => {
             }));
         }
         tokens = extractTokensFromGexText(GEX_TEXT);
+        console.info("Loaded tokens:", tokens);
     } catch (err) {
         console.error(err);
     }
@@ -144,7 +156,7 @@ client.on("messageCreate", async (message) => {
         for (let i = 0; i < words.length; i++) {
             const word = words[i];
             tokens.forEach((phraseTokens, idx) => {
-                const cleanWord = word.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "");
+                const cleanWord = word.toLowerCase().replace(/[^a-zA-Z0-9]/g, "");
                 if (phraseTokens.indexOf(cleanWord) > -1) {
                     phraseMatch = GEX_TEXT[idx];
                 }
