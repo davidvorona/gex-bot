@@ -81,7 +81,6 @@ function extractTokensFromGexText(textArray: string[]): string[][] {
         phraseWords.forEach((word) => {
             if (
                 word[0] === word[0].toUpperCase()
-                && isNaN(Number(word[0])) // Ignore numbers
             ) {
                 let IS_POSSESSIVE = false;
                 const possessiveIdx = word.indexOf(APOSTROPHE_S);
@@ -89,7 +88,10 @@ function extractTokensFromGexText(textArray: string[]): string[][] {
                     IS_POSSESSIVE = true;
                 }
                 const cleanWord = word.toLowerCase().replace(/[^a-zA-Z0-9]/g, "");
-                if(ignoredUpperCaseWords.indexOf(cleanWord) === -1) {
+                if(
+                    ignoredUpperCaseWords.indexOf(cleanWord) === -1
+                    && isNaN(Number(cleanWord[0]))
+                ) {
                     phraseTokens.push(cleanWord);
                     if (IS_POSSESSIVE) {
                         const w = cleanWord.substring(0, possessiveIdx)
