@@ -81,6 +81,7 @@ function extractTokensFromGexText(textArray: string[]): string[][] {
         phraseWords.forEach((word) => {
             if (
                 word[0] === word[0].toUpperCase()
+                && isNaN(Number(word[0])) // Ignore numbers
             ) {
                 let IS_POSSESSIVE = false;
                 const possessiveIdx = word.indexOf(APOSTROPHE_S);
