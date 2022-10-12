@@ -70,7 +70,7 @@ const GEX_TEXT = [
     "I haven't been this scared since I was trapped in Barry Manilow's rumpus room."
 ];
 
-const ignoredUpperCaseWords = ["dont", "i", "can", "to", "im", "ha", "youre", "day", "thats"];
+const ignoredUpperCaseWords = ["dont", "i", "can", "to", "im", "ha", "youre", "day", "thats", "hope"];
 const APOSTROPHE_S = "'s";
 
 function extractTokensFromGexText(textArray: string[]): string[][] {
@@ -165,8 +165,8 @@ client.on("messageCreate", async (message) => {
                 break;
             }
         }
-        const fiftyFifty = rand(2) === 0;
-        if (phraseMatch && fiftyFifty) {
+        const oneInThree = rand(3) === 0;
+        if (phraseMatch && oneInThree) {
             await message.reply(phraseMatch);
         }
     } catch (err) {
