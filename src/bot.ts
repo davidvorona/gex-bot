@@ -70,6 +70,8 @@ const GEX_TEXT = [
     "I haven't been this scared since I was trapped in Barry Manilow's rumpus room."
 ];
 
+const phraseMatchDates = new Array(GEX_TEXT.length).fill(null);
+
 const ignoredUpperCaseWords = ["dont", "i", "can", "to", "im", "ha", "youre", "day", "thats", "hope"];
 const APOSTROPHE_S = "'s";
 
@@ -104,6 +106,17 @@ function extractTokensFromGexText(textArray: string[]): string[][] {
         tokens.push(phraseTokens);
     });
     return tokens;
+}
+
+function isOnCooldown(idx: number) {
+    const oneWeekMs = 1000 * 60 * 60 * 24 * 7;
+    if (!phraseMatchDates[idx] || Date.now()
+        - phraseMatchDates[idx].getTime() > oneWeekMs
+    ) {
+        return false;
+    }
+    console.info("Ignoring phrase match for index", idx);
+    return true;
 }
 
 const setGuildCommands = async (guildId: string, builtCommands: AnyObject[] = []) => {
@@ -156,12 +169,14 @@ client.on("messageCreate", async (message) => {
         }
         const words = message.content.split(" ");
         let phraseMatch = "";
+        let phraseMatchIdx = 0;
         for (let i = 0; i < words.length; i++) {
             const word = words[i];
             tokens.forEach((phraseTokens, idx) => {
                 const cleanWord = word.toLowerCase().replace(/[^a-zA-Z0-9]/g, "");
-                if (phraseTokens.indexOf(cleanWord) > -1) {
+                if (phraseTokens.indexOf(cleanWord) > -1 && !isOnCooldown(idx)) {
                     phraseMatch = GEX_TEXT[idx];
+                    phraseMatchIdx = idx;
                 }
             });
             if (phraseMatch) {
@@ -170,6 +185,7 @@ client.on("messageCreate", async (message) => {
         }
         const oneInThree = rand(3) === 0;
         if (phraseMatch && oneInThree) {
+            phraseMatchDates[phraseMatchIdx] = new Date();
             await message.reply(phraseMatch);
         }
     } catch (err) {
