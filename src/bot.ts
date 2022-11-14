@@ -183,8 +183,8 @@ client.on("messageCreate", async (message) => {
                 break;
             }
         }
-        const oneInThree = rand(5) === 0;
-        if (phraseMatch && oneInThree) {
+        const oneInFive = rand(5) === 0;
+        if (phraseMatch && oneInFive) {
             phraseMatchDates[phraseMatchIdx] = new Date();
             await message.reply(phraseMatch);
         }
