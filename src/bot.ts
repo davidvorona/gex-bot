@@ -1,16 +1,15 @@
 import path from "path";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { Client, Guild, GatewayIntentBits } from "discord.js";
+import { Client, Guild, GatewayIntentBits, SlashCommandBuilder } from "discord.js";
 import { rand, readJson } from "./util";
-import { ConfigJson, AuthJson, AnyObject } from "./types";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const defaultCommands = require("../config/commands");
+import defaultCommands from "./commands";
+import { ConfigJson, AuthJson } from "./types";
 
 const { TOKEN } = readJson(path.join(__dirname, "../config/auth.json")) as AuthJson;
 const {
     CLIENT_ID,
+    ADMIN_USER_ID
 } = readJson(path.join(__dirname, "../config/config.json")) as ConfigJson;
 
 const rest = new REST({ version: "9" }).setToken(TOKEN);
@@ -119,7 +118,7 @@ function isOnCooldown(idx: number) {
     return true;
 }
 
-const setGuildCommands = async (guildId: string, builtCommands: AnyObject[] = []) => {
+const setGuildCommands = async (guildId: string, builtCommands: SlashCommandBuilder[] = []) => {
     try {
         console.log(`Refreshing application (/) commands for guild ${guildId}`);
         await rest.put(
@@ -202,7 +201,12 @@ client.on("interactionCreate", async (interaction) => {
         }
 
         if (interaction.commandName === "gex") {
-            await interaction.reply(GEX_TEXT[rand(GEX_TEXT.length)]);
+            const textThruGex = interaction.options.getString("text");
+            if (interaction.user.id === ADMIN_USER_ID && textThruGex) {
+                await interaction.reply(`Reminds me of that time ${interaction.user} said '${textThruGex}'`);
+            } else {
+                await interaction.reply(GEX_TEXT[rand(GEX_TEXT.length)]);
+            }
         }
     } catch (err) {
         console.error("Failed to handle slash command", err);

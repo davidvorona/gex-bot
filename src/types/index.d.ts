@@ -7,6 +7,7 @@ export interface AuthJson {
 export interface ConfigJson {
     CLIENT_ID: string;
     GUILD_ID: string;
+    ADMIN_USER_ID: string;
 }
 
 export interface AnyObject {
